@@ -1,285 +1,310 @@
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+
+
+CREATE TABLE "users" (
+    "id" bigserial NOT NULL PRIMARY KEY,
+    "login" varchar(128) NOT NULL UNIQUE,
+    "pass_hash" varchar(256) NOT NULL,
+    "full_name" varchar(128) NOT NULL,
+    "role" varchar(128) NOT NULL,
+    "is_active" boolean NOT NULL,
+    "created_at" timestamp with time zone NOT NULL,
+    "updated_at" timestamp with time zone NOT NULL,
+    "deleted_at" timestamp with time zone NULL, 
+    "created_by" bigint NULL
+);
+CREATE INDEX "ix_user_login" ON "users" ("login" text_pattern_ops);
+CREATE INDEX "ix_user_created_by" ON "users" ("created_by");
+
+
+
+CREATE TABLE "sessions" (
+    "id" bigserial NOT NULL PRIMARY KEY,
+    "user_id" bigint NOT NULL,
+    "access_token" varchar(255) NOT NULL,
+    "last_activity_at" timestamp with time zone NOT NULL,
+    "created_at" timestamp with time zone NOT NULL
+);
+CREATE INDEX ix_session_access_token ON sessions (access_token text_pattern_ops);
+
+
+
+CREATE TABLE stat_received_objects (
+    id         bigserial not null primary key,
+    created_at timestamp with time zone NOT NULL
+)
+
+CREATE INDEX ix_stat_received_object_created_at ON stat_received_objects (created_at);
+CREATE INDEX ix_stat_received_object_id ON stat_received_objects (id);
+
+
+
+CREATE TABLE stat_checked_objects (
+    id         bigserial not null primary key,
+    created_at timestamp with time zone NOT NULL
+)
+
+CREATE INDEX ix_stat_checked_object_created_at ON stat_checked_objects (created_at);
+CREATE INDEX ix_stat_checked_object_id ON stat_checked_objects (id);
+
+
+
+CREATE TABLE stat_matched_objects (
+    id           bigserial not null primary key,
+    indicator_id uuid   not null,
+    created_at   timestamp with time zone NOT NULL
+)
+
+CREATE INDEX ix_stat_matched_object_created_at ON stat_matched_objects (created_at);
+CREATE INDEX ix_stat_matched_object_indicator_id ON stat_matched_objects (indicator_id);
+CREATE INDEX ix_stat_matched_object_id ON stat_matched_objects (id);
+
+
+
+CREATE TABLE indicators
+(
+    id                        uuid default uuid_generate_v4() not null
+                              constraint indicators_pkey
+                              primary key,
+    ioc_type                  varchar(32),
+    value                     varchar(1024),
+    context                   jsonb,
+    is_sending_to_detections  boolean default true,
+    is_false_positive         boolean default false,
+    weight                    decimal,
+    feeds_weight              decimal,
+    tags_weight               decimal,
+    time_weight               decimal,
+    is_archived               boolean,
+    false_detected_counter    integer,
+    positive_detected_counter integer,
+    total_detected_counter    integer,
+    first_detected_at         timestamp with time zone,
+    last_detected_at          timestamp with time zone,
+    created_by                bigint,
+    created_at                timestamp with time zone,
+    updated_at                timestamp with time zone,
+    constraint indicators_unique_value_type
+        unique (value, ioc_type)
+);
+CREATE INDEX ix_indicator_id ON indicators (id);
+CREATE INDEX ix_indicator_created_at ON indicators (created_at);
+
+
+
+CREATE TABLE indicator_feed_relationships
+(
+    id           bigserial not null primary key,
+    indicator_id uuid not null,
+    feed_id      bigint not null,
+    created_at   timestamp with time zone,
+    deleted_at   timestamp with time zone
+);
+CREATE INDEX ix_indicator_feed_relationships_id ON indicator_feed_relationships (id);
+CREATE INDEX ix_indicator_feed_relationships_created_at ON indicator_feed_relationships (created_at);
+
+
+
+CREATE TABLE jobs
+(
+    id           bigserial not null primary key,
+    service_name varchar(64),
+    title        varchar(128),
+    result       jsonb,
+    status       varchar(32),
+    started_at   timestamp with time zone,
+    finished_at  timestamp with time zone
+);
+CREATE INDEX ix_jobs_id ON jobs (id);
+
+
+
 CREATE TABLE feeds
 (
-    id                serial not null
-                      constraint feed_pkey
-                      primary key,
-    created_at        timestamp not null,
+    id                bigserial not null primary key,
     title             varchar(128),
     provider          varchar(128),
+    description       varchar(255),
     format            varchar(8),
-    url               varchar(128),
+    url               varchar(255) not null,
     auth_type         varchar(16),
-    auth_api_token    text,
+    auth_api_token    varchar(255),
     auth_login        varchar(32),
     auth_pass         varchar(32),
-    certificate       text,
-    use_taxii         boolean,
-    polling_frequency varchar(32),
-    weight            integer,
+    certificate       blob,
+    use_taxii         boolean default false,
+    polling_frequency varchar(64),
+    weight            decimal,
+    available_fields  jsonb,
     parsing_rules     jsonb,
-    is_active         boolean,
-    updated_at        timestamp,
     status            varchar(32),
+    is_active         boolean default true,
     is_truncating     boolean default false,
-    max_records_count numeric
+    max_records_count decimal,
+    created_at        timestamp with time zone,
+    updated_at        timestamp with time zone
 );
+CREATE INDEX ix_feed_created_at ON feeds (created_at);
+CREATE INDEX ix_feed_id ON feeds (id);
 
-CREATE INDEX ix_feed_created_at
-    ON feeds (created_at);
 
-CREATE INDEX ix_feed_id
-    ON feeds (id);
 
 CREATE TABLE feeds_raw_data
 (
-    id         serial    not null
-        constraint feed_raw_data_pkey
-            primary key,
+    id         bigserial not null primary key,
     created_at timestamp not null,
-    feed_id    integer
-        constraint feed_raw_data_feed_id_fkey
-            references public.feeds,
+    feed_id    bigint,
     filename   varchar(128),
     content    bytea,
     chunk      integer
 );
 
-create index ix_feed_raw_data_created_at
-    on feeds_raw_data (created_at);
+CREATE INDEX ix_feed_raw_data_created_at ON feeds_raw_data (created_at);
+CREATE INDEX ix_feed_raw_data_id ON feeds_raw_data (id);
 
-create index ix_feed_raw_data_id
-    on feeds_raw_data (id);
 
-create table jobs
+
+CREATE TABLE tags
 (
-    id           bigserial not null
-        constraint jobs_pkey
-            primary key,
-    service_name varchar(64),
-    title        varchar(64),
-    result       jsonb,
-    status       varchar(16),
-    started_at   timestamp,
-    finished_at  timestamp
+    id           bigserial not null primary key,
+    title        varchar(128) unique,
+    weight       decimal,
+    status       varchar(32),
+    created_at   timestamp with time zone,
+    created_by   bigint,
+    updated_at   timestamp with time zone,
+    deleted_at   timestamp with time zone
 );
+CREATE INDEX ix_tags_id ON tags (id);
 
-CREATE INDEX ix_jobs_id
-    on jobs (id);
 
-create table indicators
+
+CREATE TABLE indicator_tag_relationships
 (
-    created_at                timestamp                       not null,
-    id                        uuid default uuid_generate_v4() not null
-        constraint indicators_pkey
-            primary key,
-    ioc_type                  varchar(32),
-    value                     varchar(1024),
-    context                   jsonb,
-    is_sending_to_detections  boolean,
-    is_false_positive         boolean,
-    ioc_weight                numeric,
-    tags_weight               numeric,
-    is_archived               boolean,
-    false_detected_counter    integer,
-    positive_detected_counter integer,
-    total_detected_counter    integer,
-    first_detected_at         timestamp,
-    last_detected_at          timestamp,
-    created_by                integer,
-    updated_at                timestamp,
-    constraint indicators_unique_value_type
-        unique (value, ioc_type)
-);
+    id           bigserial not null primary key,
+    indicator_id uuid,
+    tag_id       bigint,
+    created_at   timestamp with time zone
+)
+CREATE INDEX ix_indicator_tag_relationships_id ON indicator_tag_relationships (id);
 
-CREATE INDEX ix_indicators_created_at
-    on indicators (created_at);
 
-create table indicator_feed_relationships
+
+CREATE TABLE indicator_activities
 (
-    id           bigserial not null
-        constraint indicator_feed_relationships_pkey
-            primary key,
-    created_at   timestamp not null,
-    indicator_id uuid
-        constraint indicator_feed_relationships_indicator_id_fkey
-            references public.indicators
-            on delete set null,
-    feed_id      bigint
-        constraint indicator_feed_relationships_feed_id_fkey
-            references public.feeds
-            on delete set null,
-    deleted_at   timestamp
-);
-
-CREATE INDEX ix_indicator_feed_relationships_id
-    on indicator_feed_relationships (id);
-
-CREATE INDEX ix_indicator_feed_relationships_created_at
-    on indicator_feed_relationships (created_at);
+    id             bigserial not null primary key,
+    indicator_id   uuid,
+    activity_type  varchar(64),
+    created_at     timestamp with time zone,
+    created_by     bigint
+)
+CREATE INDEX ix_indicator_activities_id ON indicator_activities (id);
 
 
 
-
-
---
--- Create model Feed
---
-CREATE TABLE "feeds" ("id" bigserial NOT NULL PRIMARY KEY, "created_at" timestamp with time zone NOT NULL, "updated_at" timestamp with time zone NOT NULL, "title" text NOT NULL UNIQUE, "provider" text NOT NULL, "description" text NULL, "format" text NOT NULL, "url" text NOT NULL, "auth_type" text NULL, "auth_api_token" text NOT NULL, "auth_login" text NOT NULL, "auth_pass" text NOT NULL, "certificate" bytea NOT NULL, "use_taxii" boolean NULL, "polling_frequency" text NOT NULL, "weight" numeric(6, 3) NOT NULL, "available_fields" jsonb NOT NULL, "parsing_rules" jsonb NULL, "status" text NOT NULL, "is_active" boolean NOT NULL, "is_truncating" boolean NOT NULL, "max_records_count" numeric(20, 5) NOT NULL);
-CREATE TABLE "feeds_indicators" ("id" bigserial NOT NULL PRIMARY KEY, "feed_id" bigint NOT NULL, "indicator_id" varchar(36) NOT NULL);
-CREATE INDEX "feeds_title_990d141d_like" ON "feeds" ("title" text_pattern_ops);
-ALTER TABLE "feeds_indicators" ADD CONSTRAINT "feeds_indicators_feed_id_indicator_id_4b66f315_uniq" UNIQUE ("feed_id", "indicator_id");
-ALTER TABLE "feeds_indicators" ADD CONSTRAINT "feeds_indicators_feed_id_1104169b_fk_feeds_id" FOREIGN KEY ("feed_id") REFERENCES "feeds" ("id") DEFERRABLE INITIALLY DEFERRED;
-ALTER TABLE "feeds_indicators" ADD CONSTRAINT "feeds_indicators_indicator_id_5bc00a4b_fk_indicators_id" FOREIGN KEY ("indicator_id") REFERENCES "indicators" ("id") DEFERRABLE INITIALLY DEFERRED;
-CREATE INDEX "feeds_indicators_feed_id_1104169b" ON "feeds_indicators" ("feed_id");
-CREATE INDEX "feeds_indicators_indicator_id_5bc00a4b" ON "feeds_indicators" ("indicator_id");
-CREATE INDEX "feeds_indicators_indicator_id_5bc00a4b_like" ON "feeds_indicators" ("indicator_id" varchar_pattern_ops);
-COMMIT;
-
-BEGIN;
---
--- Create model IndicatorFeedRelationship
---
-CREATE TABLE "indicator_feed_relationships" ("id" bigserial NOT NULL PRIMARY KEY, "updated_at" timestamp with time zone NOT NULL, "created_at" timestamp with time zone NOT NULL, "deleted_at" timestamp with time zone NULL, "indicator_id_id" varchar(36) NOT NULL);
---
--- Remove field indicators from feed
---
-DROP TABLE "feeds_indicators" CASCADE;
---
--- Add field indicators to feed
---
---
--- Add field feed to indicatorfeedrelationship
---
-ALTER TABLE "indicator_feed_relationships" ADD COLUMN "feed_id" bigint NOT NULL CONSTRAINT "indicator_feed_relationships_feed_id_1867b37c_fk_feeds_id" REFERENCES "feeds"("id") DEFERRABLE INITIALLY DEFERRED; SET CONSTRAINTS "indicator_feed_relationships_feed_id_1867b37c_fk_feeds_id" IMMEDIATE;
---
--- Rename field indicator_id on indicatorfeedrelationship to indicator
---
-ALTER TABLE "indicator_feed_relationships" RENAME COLUMN "indicator_id_id" TO "indicator_id";
---
--- Remove field updated_at from indicatorfeedrelationship
---
-ALTER TABLE "indicator_feed_relationships" DROP COLUMN "updated_at" CASCADE;
-ALTER TABLE "indicator_feed_relationships" ADD CONSTRAINT "indicator_feed_relat_indicator_id_53950c25_fk_indicator" FOREIGN KEY ("indicator_id") REFERENCES "indicators" ("id") DEFERRABLE INITIALLY DEFERRED;
-CREATE INDEX "indicator_feed_relationships_indicator_id_53950c25" ON "indicator_feed_relationships" ("indicator_id");
-CREATE INDEX "indicator_feed_relationships_indicator_id_53950c25_like" ON "indicator_feed_relationships" ("indicator_id" varchar_pattern_ops);
-CREATE INDEX "indicator_feed_relationships_feed_id_1867b37c" ON "indicator_feed_relationships" ("feed_id");
-COMMIT;
-
-BEGIN;
---
--- Create model Indicator
---
-CREATE TABLE "indicators" ("created_at" timestamp with time zone NOT NULL, "updated_at" timestamp with time zone NOT NULL, "id" varchar(36) NOT NULL PRIMARY KEY, "ioc_type" varchar(32) NOT NULL, "value" varchar(512) NOT NULL, "context" jsonb NOT NULL, "is_sending_to_detections" boolean NOT NULL, "is_false_positive" boolean NOT NULL, "weight" numeric(6, 3) NOT NULL, "tags_weight" numeric(6, 3) NOT NULL, "is_archived" boolean NOT NULL, "false_detected_counter" bigint NOT NULL, "positive_detected_counter" bigint NOT NULL, "total_detected_counter" bigint NOT NULL, "first_detected_at" timestamp with time zone NOT NULL, "last_detected_at" timestamp with time zone NOT NULL, "created_by_id" bigint NULL);
---
--- Create model Session
---
-CREATE TABLE "sessions" ("id" bigserial NOT NULL PRIMARY KEY, "access_token" varchar(255) NOT NULL, "last_activity_at" timestamp with time zone NOT NULL, "created_at" timestamp with time zone NOT NULL, "user_id_id" bigint NOT NULL);
---
--- Create model IndicatorActivities
---
-CREATE TABLE "activities" ("id" bigserial NOT NULL PRIMARY KEY, "created_at" timestamp with time zone NOT NULL, "updated_at" timestamp with time zone NOT NULL, "type" varchar(50) NOT NULL, "details" jsonb NOT NULL, "indicator_id" varchar(36) NOT NULL);
-ALTER TABLE "indicators" ADD CONSTRAINT "indicators_ioc_type_value_41d377bc_uniq" UNIQUE ("ioc_type", "value");
-ALTER TABLE "indicators" ADD CONSTRAINT "indicators_created_by_id_1b25a4eb_fk_users_id" FOREIGN KEY ("created_by_id") REFERENCES "users" ("id") DEFERRABLE INITIALLY DEFERRED;
-CREATE INDEX "indicators_id_bea8fe23_like" ON "indicators" ("id" varchar_pattern_ops);
-CREATE INDEX "indicators_created_by_id_1b25a4eb" ON "indicators" ("created_by_id");
-ALTER TABLE "sessions" ADD CONSTRAINT "sessions_user_id_id_38efddc1_fk_users_id" FOREIGN KEY ("user_id_id") REFERENCES "users" ("id") DEFERRABLE INITIALLY DEFERRED;
-CREATE INDEX "sessions_user_id_id_38efddc1" ON "sessions" ("user_id_id");
-ALTER TABLE "activities" ADD CONSTRAINT "activities_indicator_id_7ecc5c5e_fk_indicators_id" FOREIGN KEY ("indicator_id") REFERENCES "indicators" ("id") DEFERRABLE INITIALLY DEFERRED;
-CREATE INDEX "activities_indicator_id_7ecc5c5e" ON "activities" ("indicator_id");
-CREATE INDEX "activities_indicator_id_7ecc5c5e_like" ON "activities" ("indicator_id" varchar_pattern_ops);
-COMMIT;
-
-
-BEGIN;
---
--- Change Meta options on indicatoractivities
---
---
--- Remove field updated_at from indicatoractivities
---
-ALTER TABLE "activities" DROP COLUMN "updated_at" CASCADE;
---
--- Add field created_by to indicatoractivities
---
-ALTER TABLE "activities" ADD COLUMN "created_by_id" bigint NOT NULL CONSTRAINT "activities_created_by_id_8862b97d_fk_users_id" REFERENCES "users"("id") DEFERRABLE INITIALLY DEFERRED; SET CONSTRAINTS "activities_created_by_id_8862b97d_fk_users_id" IMMEDIATE;
---
--- Alter field created_at on indicatoractivities
---
---
--- Alter field type on indicatoractivities
---
-ALTER TABLE "activities" ALTER COLUMN "type" TYPE text USING "type"::text;
---
--- Rename table for indicatoractivities to indicator_activities
---
-ALTER TABLE "activities" RENAME TO "indicator_activities";
---
--- Alter field access_token on session
---
-ALTER TABLE "sessions" ALTER COLUMN "access_token" TYPE text USING "access_token"::text;
-CREATE INDEX "indicator_activities_created_by_id_a9892b79" ON "indicator_activities" ("created_by_id");
-COMMIT;
-
-
-BEGIN;
---
--- Create model Source
---
-CREATE TABLE "sources" ("id" bigserial NOT NULL PRIMARY KEY, "created_at" timestamp with time zone NOT NULL, "updated_at" timestamp with time zone NOT NULL, "name" varchar(255) NOT NULL UNIQUE, "is_instead_full" boolean NOT NULL, "is_active" boolean NOT NULL, "provider_name" varchar(255) NOT NULL, "path" text NOT NULL, "certificate" varchar(100) NULL, "authenticity" integer NOT NULL, "format" varchar(17) NOT NULL, "auth_type" varchar(17) NOT NULL, "auth_login" varchar(32) NULL, "auth_password" varchar(64) NULL, "max_rows" integer NULL, "raw_indicators" text NULL, "update_time_period" bigint NOT NULL CHECK ("update_time_period" >= 0));
-CREATE INDEX "sources_name_94ff009b_like" ON "sources" ("name" varchar_pattern_ops);
-COMMIT;
-
-
-BEGIN;
---
--- Create model Tag
---
-CREATE TABLE "tags" ("id" bigserial NOT NULL PRIMARY KEY, "created_at" timestamp with time zone NOT NULL, "updated_at" timestamp with time zone NOT NULL, "title" text NOT NULL UNIQUE, "weight" numeric(6, 3) NULL, "deleted_at" timestamp with time zone NULL, "created_by_id" bigint NOT NULL);
-ALTER TABLE "tags" ADD CONSTRAINT "tags_created_by_id_bc2c5343_fk_users_id" FOREIGN KEY ("created_by_id") REFERENCES "users" ("id") DEFERRABLE INITIALLY DEFERRED;
-CREATE INDEX "tags_title_14a4130c_like" ON "tags" ("title" text_pattern_ops);
-CREATE INDEX "tags_created_by_id_bc2c5343" ON "tags" ("created_by_id");
-COMMIT;
+CREATE TABLE detections
+(
+    id              bigserial not null primary key,
+    source_event    jsonb,
+    indicator_id    uuid,
+    detection_event jsonb,
+    tags_weight     bigint,
+    created_at      timestamp with time zone
+)
+CREATE INDEX ix_detections_id ON detections (id);
 
 
 
-BEGIN;
---
--- Alter field created_at on tag
---
---
--- Alter field updated_at on tag
---
-COMMIT;
-
-
-BEGIN;
---
--- Create model IndicatorTagRelationship
---
-CREATE TABLE "indicator_tag_relationships" ("id" bigserial NOT NULL PRIMARY KEY, "created_at" timestamp with time zone NOT NULL, "deleted_at" timestamp with time zone NULL, "indicator_id" varchar(36) NOT NULL);
---
--- Add field indicators to tag
---
---
--- Add field tag to indicatortagrelationship
---
-ALTER TABLE "indicator_tag_relationships" ADD COLUMN "tag_id" bigint NOT NULL CONSTRAINT "indicator_tag_relationships_tag_id_41eb5122_fk_tags_id" REFERENCES "tags"("id") DEFERRABLE INITIALLY DEFERRED; SET CONSTRAINTS "indicator_tag_relationships_tag_id_41eb5122_fk_tags_id" IMMEDIATE;
-ALTER TABLE "indicator_tag_relationships" ADD CONSTRAINT "indicator_tag_relati_indicator_id_0e19c41d_fk_indicator" FOREIGN KEY ("indicator_id") REFERENCES "indicators" ("id") DEFERRABLE INITIALLY DEFERRED;
-CREATE INDEX "indicator_tag_relationships_indicator_id_0e19c41d" ON "indicator_tag_relationships" ("indicator_id");
-CREATE INDEX "indicator_tag_relationships_indicator_id_0e19c41d_like" ON "indicator_tag_relationships" ("indicator_id" varchar_pattern_ops);
-CREATE INDEX "indicator_tag_relationships_tag_id_41eb5122" ON "indicator_tag_relationships" ("tag_id");
-COMMIT;
-
-
-BEGIN;
---
--- Create model User
---
-CREATE TABLE "users" ("id" bigserial NOT NULL PRIMARY KEY, "last_login" timestamp with time zone NULL, "login" text NOT NULL UNIQUE, "pass_hash" text NOT NULL, "full_name" text NOT NULL, "role" text NOT NULL, "is_active" boolean NOT NULL, "created_at" timestamp with time zone NOT NULL, "updated_at" timestamp with time zone NOT NULL, "deleted_at" timestamp with time zone NULL, "staff" boolean NOT NULL, "admin" boolean NOT NULL, "created_by" bigint NULL);
-ALTER TABLE "users" ADD CONSTRAINT "users_created_by_0c0a4e75_fk_users_id" FOREIGN KEY ("created_by") REFERENCES "users" ("id") DEFERRABLE INITIALLY DEFERRED;
-CREATE INDEX "users_login_3b007138_like" ON "users" ("login" text_pattern_ops);
-CREATE INDEX "users_created_by_0c0a4e75" ON "users" ("created_by");
-COMMIT;
+CREATE TABLE detection_tag_relationships
+(
+    id              bigserial not null primary key,
+    detection_id    bigint,
+    tag_id          bigint,
+    created_at      timestamp with time zone
+)
+CREATE INDEX ix_detection_tag_relationships_id ON detection_tag_relationships (id);
 
 
 
+CREATE TABLE context_sources
+(
+    id                          bigserial not null primary key,
+    ioc_type                    varchar(32),
+    source_url                  varchar(255) not null,
+    request_method              varchar(32),
+    request_headers             text,
+    request_body                text,
+    inbound_removable_prefix    varchar(128),
+    outbound_appendable_prefix  varchar(128),
+    created_at                  timestamp with time zone,
+    created_by                  bigint
+)
+CREATE INDEX ix_context_sources_id ON context_sources (id);
+
+
+
+CREATE TABLE indicator_context_source_relationships
+(
+    id                 bigserial not null primary key,
+    indicator_id       uuid,
+    context_source_id  bigint,
+    created_at         timestamp with time zone
+)
+CREATE INDEX ix_indicator_context_source_relationships_id ON indicator_context_source_relationships (id);
+
+
+
+CREATE TABLE search_history
+(
+    id                 bigserial not null primary key,
+    search_type        varchar(64),
+    query_text         varchar(255),
+    query_data         bytea,
+    results            jsonb,
+    created_at         timestamp with time zone,
+    created_by         bigint
+)
+CREATE INDEX ix_search_history_id ON search_history (id);
+
+
+
+CREATE TABLE user_settings
+(
+    id                 bigserial not null primary key,
+    user_id            bigint,
+    key                varchar(128),
+    value              jsonb,
+    created_at         timestamp with time zone,
+    created_by         bigint
+)
+CREATE INDEX ix_user_settings_id ON user_settings (id);
+
+
+
+CREATE TABLE platform_settings
+(
+    id                 bigserial not null primary key,
+    key                varchar(128),
+    value              jsonb,
+    created_at         timestamp with time zone,
+    created_by         bigint
+)
+CREATE INDEX ix_platform_settings_id ON platform_settings (id);
+
+
+
+CREATE TABLE audit_logs
+(
+    id                 bigserial not null primary key,
+    service_name       varchar(128),
+    user_id            bigint,
+    event_type         varchar(128),
+    object_type        varchar(128),
+    object_name        varchar(128),
+    description        varchar(256),
+    prev_value         jsonb,
+    new_value          jsonb,
+    context            jsonb,
+    created_at         timestamp with time zone
+)
+CREATE INDEX ix_audit_logs_id ON audit_logs (id);
