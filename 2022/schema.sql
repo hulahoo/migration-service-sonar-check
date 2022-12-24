@@ -1,7 +1,7 @@
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 
-CREATE TABLE IF NOT EXISTS users (
+CREATE TABLE IF NOT EXISTS "users" (
     id         bigserial NOT NULL PRIMARY KEY,
     "login"    varchar(128) NOT NULL UNIQUE,
     pass_hash  varchar(256) NOT NULL,
@@ -9,15 +9,12 @@ CREATE TABLE IF NOT EXISTS users (
     "role"     varchar(128) NOT NULL,
     is_active  boolean NOT NULL default true,
     created_at timestamp with time zone NOT NULL,
+    created_by bigint,
     updated_at timestamp with time zone NOT NULL,
-    deleted_at timestamp with time zone NULL,
-    created_by bigint NULL,
-    last_login timestamp with time zone NULL,
-    "admin" boolean default false,
-    staff boolean default false,
+    deleted_at timestamp with time zone
 );
-CREATE INDEX IF NOT EXISTS "ix_user_login" ON "users" ("login" text_pattern_ops);
-CREATE INDEX IF NOT EXISTS "ix_user_created_by" ON "users" ("created_by");
+CREATE INDEX IF NOT EXISTS ix_user_login ON users ("login" text_pattern_ops);
+CREATE INDEX IF NOT EXISTS ix_user_created_by ON users ("created_by");
 
 
 
@@ -105,7 +102,7 @@ CREATE INDEX IF NOT EXISTS ix_indicator_feed_relationships_created_at ON indicat
 
 
 
-CREATE TABLE IF NOT EXISTS jobs
+CREATE TABLE IF NOT EXISTS processes
 (
     id           bigserial not null primary key,
     parent_id    bigint null,
@@ -116,7 +113,7 @@ CREATE TABLE IF NOT EXISTS jobs
     started_at   timestamp with time zone,
     finished_at  timestamp with time zone
 );
-CREATE INDEX IF NOT EXISTS ix_jobs_id ON jobs (id);
+CREATE INDEX IF NOT EXISTS ix_jobs_id ON processes (id);
 
 
 
@@ -127,20 +124,21 @@ CREATE TABLE IF NOT EXISTS feeds
     provider          varchar(128),
     description       varchar(255),
     format            varchar(8),
-    url               varchar(255) not null,
+    url               varchar(255),
     auth_type         varchar(16),
     auth_api_token    varchar(255),
     auth_login        varchar(32),
     auth_pass         varchar(32),
     certificate       bytea,
+    use_taxii         boolean default false,
+    polling_frequency varchar(32),
     id_use            boolean default false,
-    polling_frequency varchar(64),
     weight            decimal,
     available_fields  jsonb,
     parsing_rules     jsonb,
     status            varchar(32),
     is_active         boolean default true,
-    is_truncating     boolean default false,
+    is_truncating     boolean default true,
     max_records_count decimal,
     created_at        timestamp with time zone,
     updated_at        timestamp with time zone
@@ -153,11 +151,11 @@ CREATE INDEX IF NOT EXISTS ix_feed_id ON feeds (id);
 CREATE TABLE IF NOT EXISTS feeds_raw_data
 (
     id         bigserial not null primary key,
-    created_at timestamp not null,
     feed_id    bigint,
     filename   varchar(128),
     content    bytea,
-    chunk      integer
+    chunk      integer,
+    created_at timestamp not null
 );
 CREATE INDEX IF NOT EXISTS ix_feed_raw_data_created_at ON feeds_raw_data (created_at);
 CREATE INDEX IF NOT EXISTS ix_feed_raw_data_id ON feeds_raw_data (id);
@@ -196,7 +194,7 @@ CREATE TABLE IF NOT EXISTS indicator_activities
     activity_type  varchar(64),
     details        jsonb,
     created_at     timestamp with time zone,
-    created_by     bigint
+    created_by     bigint null
 );
 CREATE INDEX IF NOT EXISTS ix_indicator_activities_id ON indicator_activities (id);
 
@@ -229,9 +227,9 @@ CREATE INDEX IF NOT EXISTS ix_detection_tag_relationships_id ON detection_tag_re
 CREATE TABLE IF NOT EXISTS context_sources
 (
     id                          bigserial not null primary key,
-    ioc_type                    varchar(32),
+    ioc_type                    varchar(32) not null,
     source_url                  varchar(255) not null,
-    request_method              varchar(16),
+    request_method              varchar(16) not null,
     request_headers             text,
     request_body                text,
     inbound_removable_prefix    varchar(128),
@@ -315,7 +313,7 @@ CREATE INDEX IF NOT EXISTS ix_audit_logs_id ON audit_logs (id);
 -- Создание админа
 CREATE EXTENSION IF NOT EXISTS pgcrypto;
 
-INSERT INTO users (
+INSERT INTO "users" (
     login,
     pass_hash,
     full_name,
