@@ -1,18 +1,20 @@
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
-CREATE DATABASE db
-    WITH
-    OWNER = postgres
-    ENCODING = 'UTF8'
-    LC_COLLATE = 'ru_RU.UTF-8@icu'
-    LC_CTYPE = 'ru_RU.UTF-8'
-    TABLESPACE = pg_default
-    CONNECTION LIMIT = -1
-    IS_TEMPLATE = False;
+-- Если есть права на удаление БД:
 
-GRANT ALL ON DATABASE db TO postgres;
-GRANT ALL ON DATABASE db TO dbuser;
-GRANT TEMPORARY, CONNECT ON DATABASE db TO PUBLIC;
+-- DROP DATABASE IF EXISTS db;
+-- CREATE DATABASE db
+--    WITH
+--     OWNER = postgres
+--     ENCODING = 'UTF8'
+--     LC_COLLATE = 'ru_RU.UTF-8@icu'
+--     LC_CTYPE = 'ru_RU.UTF-8'
+--     TABLESPACE = pg_default
+--     CONNECTION LIMIT = -1
+--     IS_TEMPLATE = False;
+-- GRANT ALL ON DATABASE db TO postgres;
+-- GRANT ALL ON DATABASE db TO dbuser;
+-- GRANT TEMPORARY, CONNECT ON DATABASE db TO PUBLIC;
 
 CREATE TABLE IF NOT EXISTS "users" (
     id         bigserial NOT NULL PRIMARY KEY,
