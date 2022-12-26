@@ -11,7 +11,11 @@ CREATE TABLE IF NOT EXISTS "users" (
     created_at timestamp with time zone NOT NULL,
     created_by bigint,
     updated_at timestamp with time zone NOT NULL,
-    deleted_at timestamp with time zone
+    deleted_at timestamp with time zone NULL,
+    created_by bigint NULL,
+    last_login timestamp with time zone NULL,
+    "admin"    boolean default false,
+    staff      boolean default false
 );
 CREATE INDEX IF NOT EXISTS ix_user_login ON users ("login" text_pattern_ops);
 CREATE INDEX IF NOT EXISTS ix_user_created_by ON users ("created_by");
@@ -323,7 +327,7 @@ INSERT INTO "users" (
     updated_at
 ) VALUES (
     'admin',
-    crypt('admin', gen_salt('md5')),
+    crypt('admin', 'admin'),
     'admin',
     'admin',
     True,
