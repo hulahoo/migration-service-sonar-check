@@ -85,6 +85,7 @@ CREATE TABLE IF NOT EXISTS indicators
     created_by                bigint,
     created_at                timestamp with time zone,
     updated_at                timestamp with time zone,
+    deleted_at                timestamp with time zone,
     constraint indicators_unique_value_type
         unique (value, ioc_type)
 );
