@@ -295,12 +295,15 @@ CREATE INDEX IF NOT EXISTS ix_indicator_activities_id ON indicator_activities (i
 
 CREATE TABLE IF NOT EXISTS detections
 (
-    id              bigserial not null primary key,
-    source_event    jsonb,
-    indicator_id    uuid,
-    detection_event jsonb,
-    tags_weight     bigint,
-    created_at      timestamp with time zone
+    id                bigserial not null primary key,
+    source_message    text,
+    source_event      jsonb,
+    indicator_id      uuid,
+    detection_event   jsonb,
+    detection_message text,
+    tags_weight       decimal,
+    indicator_weight  decimal,
+    created_at        timestamp with time zone
 );
 CREATE INDEX IF NOT EXISTS ix_detections_id ON detections (id);
 
