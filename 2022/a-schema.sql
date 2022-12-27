@@ -320,6 +320,17 @@ CREATE INDEX IF NOT EXISTS ix_detection_tag_relationships_id ON detection_tag_re
 
 
 
+CREATE TABLE IF NOT EXISTS detection_feed_relationships
+(
+    id                 bigserial not null primary key,
+    detection_id       bigint,
+    feed_id             bigint,
+    created_at         timestamp with time zone
+);
+CREATE INDEX IF NOT EXISTS ix_detection_feed_relationships_id ON detection_feed_relationships (id);
+
+
+
 CREATE TABLE IF NOT EXISTS context_sources
 (
     id                          bigserial not null primary key,
