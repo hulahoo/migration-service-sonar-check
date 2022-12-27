@@ -223,7 +223,7 @@ CREATE TABLE IF NOT EXISTS feeds
     auth_login        varchar(32),
     auth_pass         varchar(32),
     certificate       bytea,
-    use_taxii         boolean default false,
+    is_use_taxii      boolean default false,
     polling_frequency varchar(32),
     id_use            boolean default false,
     weight            decimal,
