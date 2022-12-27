@@ -16,6 +16,80 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 -- GRANT ALL ON DATABASE db TO dbuser;
 -- GRANT TEMPORARY, CONNECT ON DATABASE db TO PUBLIC;
 
+-- -- DROP STATEMENTS START
+
+-- users table/index
+DROP TABLE IF EXISTS "users";
+
+-- sessions table/index
+DROP TABLE IF EXISTS "sessions";
+
+-- stat_received_objects table/index
+DROP TABLE IF EXISTS "stat_received_objects";
+
+-- stat_checked_objects table/index
+DROP TABLE IF EXISTS "stat_checked_objects";
+
+-- stat_matched_objects table/index
+DROP TABLE IF EXISTS "stat_matched_objects";
+
+-- indicators table/index
+DROP TABLE IF EXISTS "indicators";
+
+-- indicator_feed_relationships table/index
+DROP TABLE IF EXISTS "indicator_feed_relationships";
+
+-- processes table/index
+DROP TABLE IF EXISTS "processes";
+
+-- feeds table/index
+DROP TABLE IF EXISTS "feeds";
+
+-- feeds_raw_data table/index
+DROP TABLE IF EXISTS "feeds_raw_data";
+
+-- tags table/index
+DROP TABLE IF EXISTS "tags";
+
+-- indicator_tag_relationships table/index
+DROP TABLE IF EXISTS "indicator_tag_relationships";
+
+-- indicator_activities table/index
+DROP TABLE IF EXISTS "indicator_activities";
+
+-- detections table/index
+DROP TABLE IF EXISTS "detections";
+
+-- detections table/index
+DROP TABLE IF EXISTS "detections";
+
+-- detection_tag_relationships table/index
+DROP TABLE IF EXISTS "detection_tag_relationships";
+
+-- context_sources table/index
+DROP TABLE IF EXISTS "context_sources";
+
+-- indicator_context_source_relationships table/index
+DROP TABLE IF EXISTS "indicator_context_source_relationships";
+
+-- search_history table/index
+DROP TABLE IF EXISTS "search_history";
+
+-- search_history table/index
+DROP TABLE IF EXISTS "search_history";
+
+-- user_settings table/index
+DROP TABLE IF EXISTS "user_settings";
+
+-- platform_settings table/index
+DROP TABLE IF EXISTS "platform_settings";
+
+-- audit_logs table/index
+DROP TABLE IF EXISTS "audit_logs";
+
+-- -- DROP STATEMENTS END
+
+
 CREATE TABLE IF NOT EXISTS "users" (
     id         bigserial NOT NULL PRIMARY KEY,
     "login"    varchar(128) NOT NULL UNIQUE,
@@ -24,7 +98,6 @@ CREATE TABLE IF NOT EXISTS "users" (
     "role"     varchar(128) NOT NULL,
     is_active  boolean NOT NULL default true,
     created_at timestamp with time zone NOT NULL,
-    created_by bigint,
     updated_at timestamp with time zone NOT NULL,
     deleted_at timestamp with time zone NULL,
     created_by bigint NULL,
