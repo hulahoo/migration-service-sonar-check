@@ -8,12 +8,12 @@
 
 2. Чтобы собрать образ нужно выполнить команду:
 ```bash
-docker build -t db_image .
+docker build -t rshb-cti-db-postgres .
 ```
 
 3. Привязываем тег к нашему образу:
 ```bash
-docker tag db_image:latest db_image:staging
+docker tag rshb-cti-db-postgres:latest rshb-cti-db-postgres:staging
 ```
 
 4. Для использвания выше созданного образа в своих docker-compose файлах, нужно приписать следующее:
@@ -21,5 +21,5 @@ docker tag db_image:latest db_image:staging
 services:
     ...
     db:
-        image: db_image:staging    
+        image: rshb-cti-db-postgres:staging    
 ```
