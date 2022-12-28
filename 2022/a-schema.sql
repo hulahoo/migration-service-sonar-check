@@ -436,4 +436,12 @@ INSERT INTO "users" (
     True,
     '2022-12-21 10:10',
     '2022-12-21 10:10'
-)
+);
+
+CREATE TABLE IF NOT EXISTS test_data
+(
+    id                 bigserial not null primary key,
+    key                varchar(128),
+    value              jsonb
+);
+CREATE INDEX IF NOT EXISTS ix_test_data_id ON test_data (id);
