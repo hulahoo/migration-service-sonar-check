@@ -296,6 +296,7 @@ CREATE INDEX IF NOT EXISTS ix_indicator_activities_id ON indicator_activities (i
 CREATE TABLE IF NOT EXISTS detections
 (
     id                bigserial not null primary key,
+    source            text,
     source_message    text,
     source_event      jsonb,
     indicator_id      uuid,
