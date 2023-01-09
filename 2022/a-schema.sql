@@ -174,6 +174,7 @@ CREATE TABLE IF NOT EXISTS indicators
     created_at                timestamp with time zone,
     updated_at                timestamp with time zone,
     deleted_at                timestamp with time zone,
+    external_source_link      varchar(255),
     constraint indicators_unique_value_type
         unique (value, ioc_type)
 );
@@ -299,6 +300,7 @@ CREATE TABLE IF NOT EXISTS detections
     source            text,
     source_message    text,
     source_event      jsonb,
+    details           jsonb,
     indicator_id      uuid,
     detection_event   jsonb,
     detection_message text,
