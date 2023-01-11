@@ -408,6 +408,7 @@ CREATE TABLE IF NOT EXISTS audit_logs
     id                 bigserial not null primary key,
     service_name       varchar(128),
     user_id            bigint,
+    user_name          varchar(256),
     event_type         varchar(128),
     object_type        varchar(128),
     object_name        varchar(128),
@@ -433,7 +434,7 @@ INSERT INTO "users" (
     updated_at
 ) VALUES (
     'admin',
-    crypt('admin', 'admin'),
+    encode(digest('admin', 'sha256'), 'hex'),
     'admin',
     'admin',
     True,
