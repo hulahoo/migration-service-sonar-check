@@ -123,22 +123,22 @@ CREATE INDEX IF NOT EXISTS ix_session_access_token ON sessions (access_token tex
 
 CREATE TABLE IF NOT EXISTS stat_received_objects (
     id         bigserial not null primary key,
-    indicator_id uuid   not null,
+    indicator_id uuid,
     created_at timestamp with time zone NOT NULL
 );
 CREATE INDEX IF NOT EXISTS ix_stat_received_object_created_at ON stat_received_objects (created_at);
-CREATE INDEX IF NOT EXISTS ix_stat_matched_object_indicator_id ON stat_matched_objects (indicator_id);
+CREATE INDEX IF NOT EXISTS ix_stat_matched_object_indicator_id ON stat_received_objects (indicator_id);
 CREATE INDEX IF NOT EXISTS ix_stat_received_object_id ON stat_received_objects (id);
 
 
 
 CREATE TABLE IF NOT EXISTS stat_checked_objects (
     id         bigserial not null primary key,
-    indicator_id uuid   not null,
+    indicator_id uuid,
     created_at timestamp with time zone NOT NULL
 );
 CREATE INDEX IF NOT EXISTS ix_stat_checked_object_created_at ON stat_checked_objects (created_at);
-CREATE INDEX IF NOT EXISTS ix_stat_matched_object_indicator_id ON stat_matched_objects (indicator_id);
+CREATE INDEX IF NOT EXISTS ix_stat_matched_object_indicator_id ON stat_checked_objects (indicator_id);
 CREATE INDEX IF NOT EXISTS ix_stat_checked_object_id ON stat_checked_objects (id);
 
 
