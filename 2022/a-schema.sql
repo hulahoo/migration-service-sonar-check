@@ -233,6 +233,7 @@ CREATE TABLE IF NOT EXISTS feeds
     id_use            boolean default false,
     weight            decimal,
     available_fields  jsonb,
+    importing_fields  jsonb,
     parsing_rules     jsonb,
     status            varchar(32),
     is_active         boolean default true,
