@@ -218,7 +218,7 @@ CREATE INDEX IF NOT EXISTS ix_jobs_id ON processes (id);
 CREATE TABLE IF NOT EXISTS feeds
 (
     id                bigserial not null primary key,
-    title             varchar(128),
+    title             varchar(128) UNIQUE,
     provider          varchar(128),
     description       varchar(255),
     format            varchar(8),
