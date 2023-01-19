@@ -19,73 +19,73 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 -- -- DROP STATEMENTS START
 
 -- users table/index
-DROP TABLE IF EXISTS "users";
-
--- sessions table/index
-DROP TABLE IF EXISTS "sessions";
-
--- stat_received_objects table/index
-DROP TABLE IF EXISTS "stat_received_objects";
-
--- stat_checked_objects table/index
-DROP TABLE IF EXISTS "stat_checked_objects";
-
--- stat_matched_objects table/index
-DROP TABLE IF EXISTS "stat_matched_objects";
-
--- indicators table/index
-DROP TABLE IF EXISTS "indicators";
-
--- indicator_feed_relationships table/index
-DROP TABLE IF EXISTS "indicator_feed_relationships";
-
--- processes table/index
-DROP TABLE IF EXISTS "processes";
-
--- feeds table/index
-DROP TABLE IF EXISTS "feeds";
-
--- feeds_raw_data table/index
-DROP TABLE IF EXISTS "feeds_raw_data";
-
--- tags table/index
-DROP TABLE IF EXISTS "tags";
-
--- indicator_tag_relationships table/index
-DROP TABLE IF EXISTS "indicator_tag_relationships";
-
--- indicator_activities table/index
-DROP TABLE IF EXISTS "indicator_activities";
-
--- detections table/index
-DROP TABLE IF EXISTS "detections";
-
--- detections table/index
-DROP TABLE IF EXISTS "detections";
-
--- detection_tag_relationships table/index
-DROP TABLE IF EXISTS "detection_tag_relationships";
-
--- context_sources table/index
-DROP TABLE IF EXISTS "context_sources";
-
--- indicator_context_source_relationships table/index
-DROP TABLE IF EXISTS "indicator_context_source_relationships";
-
--- search_history table/index
-DROP TABLE IF EXISTS "search_history";
-
--- search_history table/index
-DROP TABLE IF EXISTS "search_history";
-
--- user_settings table/index
-DROP TABLE IF EXISTS "user_settings";
-
--- platform_settings table/index
-DROP TABLE IF EXISTS "platform_settings";
-
--- audit_logs table/index
-DROP TABLE IF EXISTS "audit_logs";
+-- DROP TABLE IF EXISTS "users";
+--
+-- -- sessions table/index
+-- DROP TABLE IF EXISTS "sessions";
+--
+-- -- stat_received_objects table/index
+-- DROP TABLE IF EXISTS "stat_received_objects";
+--
+-- -- stat_checked_objects table/index
+-- DROP TABLE IF EXISTS "stat_checked_objects";
+--
+-- -- stat_matched_objects table/index
+-- DROP TABLE IF EXISTS "stat_matched_objects";
+--
+-- -- indicators table/index
+-- DROP TABLE IF EXISTS "indicators";
+--
+-- -- indicator_feed_relationships table/index
+-- DROP TABLE IF EXISTS "indicator_feed_relationships";
+--
+-- -- processes table/index
+-- DROP TABLE IF EXISTS "processes";
+--
+-- -- feeds table/index
+-- DROP TABLE IF EXISTS "feeds";
+--
+-- -- feeds_raw_data table/index
+-- DROP TABLE IF EXISTS "feeds_raw_data";
+--
+-- -- tags table/index
+-- DROP TABLE IF EXISTS "tags";
+--
+-- -- indicator_tag_relationships table/index
+-- DROP TABLE IF EXISTS "indicator_tag_relationships";
+--
+-- -- indicator_activities table/index
+-- DROP TABLE IF EXISTS "indicator_activities";
+--
+-- -- detections table/index
+-- DROP TABLE IF EXISTS "detections";
+--
+-- -- detections table/index
+-- DROP TABLE IF EXISTS "detections";
+--
+-- -- detection_tag_relationships table/index
+-- DROP TABLE IF EXISTS "detection_tag_relationships";
+--
+-- -- context_sources table/index
+-- DROP TABLE IF EXISTS "context_sources";
+--
+-- -- indicator_context_source_relationships table/index
+-- DROP TABLE IF EXISTS "indicator_context_source_relationships";
+--
+-- -- search_history table/index
+-- DROP TABLE IF EXISTS "search_history";
+--
+-- -- search_history table/index
+-- DROP TABLE IF EXISTS "search_history";
+--
+-- -- user_settings table/index
+-- DROP TABLE IF EXISTS "user_settings";
+--
+-- -- platform_settings table/index
+-- DROP TABLE IF EXISTS "platform_settings";
+--
+-- -- audit_logs table/index
+-- DROP TABLE IF EXISTS "audit_logs";
 
 -- -- DROP STATEMENTS END
 
@@ -119,29 +119,33 @@ CREATE TABLE IF NOT EXISTS "sessions" (
 );
 CREATE INDEX IF NOT EXISTS ix_session_access_token ON sessions (access_token text_pattern_ops);
 
-
+-- #######
 
 CREATE TABLE IF NOT EXISTS stat_received_objects (
     id         bigserial not null primary key,
-    indicator_id uuid,
     created_at timestamp with time zone NOT NULL
 );
 CREATE INDEX IF NOT EXISTS ix_stat_received_object_created_at ON stat_received_objects (created_at);
-CREATE INDEX IF NOT EXISTS ix_stat_matched_object_indicator_id ON stat_received_objects (indicator_id);
 CREATE INDEX IF NOT EXISTS ix_stat_received_object_id ON stat_received_objects (id);
 
+-- Added indicator_id to stat_received_objects
+ALTER TABLE stat_received_objects ADD indicator_id uuid;
+CREATE INDEX IF NOT EXISTS ix_stat_received_object_indicator_id ON stat_received_objects (indicator_id);
 
+-- #######
 
 CREATE TABLE IF NOT EXISTS stat_checked_objects (
     id         bigserial not null primary key,
-    indicator_id uuid,
     created_at timestamp with time zone NOT NULL
 );
 CREATE INDEX IF NOT EXISTS ix_stat_checked_object_created_at ON stat_checked_objects (created_at);
-CREATE INDEX IF NOT EXISTS ix_stat_matched_object_indicator_id ON stat_checked_objects (indicator_id);
 CREATE INDEX IF NOT EXISTS ix_stat_checked_object_id ON stat_checked_objects (id);
 
+-- Added indicator_id to stat_checked_objects
+ALTER TABLE stat_checked_objects ADD indicator_id uuid;
+CREATE INDEX IF NOT EXISTS ix_stat_checked_object_indicator_id ON stat_received_objects (indicator_id);
 
+-- #######
 
 CREATE TABLE IF NOT EXISTS stat_matched_objects (
     id           bigserial not null primary key,
@@ -213,12 +217,12 @@ CREATE TABLE IF NOT EXISTS processes
 );
 CREATE INDEX IF NOT EXISTS ix_jobs_id ON processes (id);
 
-
+-- #######
 
 CREATE TABLE IF NOT EXISTS feeds
 (
     id                bigserial not null primary key,
-    title             varchar(128) UNIQUE,
+    title             varchar(128),
     provider          varchar(128),
     description       varchar(255),
     format            varchar(8),
@@ -233,7 +237,6 @@ CREATE TABLE IF NOT EXISTS feeds
     id_use            boolean default false,
     weight            decimal,
     available_fields  jsonb,
-    importing_fields  jsonb,
     parsing_rules     jsonb,
     status            varchar(32),
     is_active         boolean default true,
@@ -245,7 +248,10 @@ CREATE TABLE IF NOT EXISTS feeds
 CREATE INDEX IF NOT EXISTS ix_feed_created_at ON feeds (created_at);
 CREATE INDEX IF NOT EXISTS ix_feed_id ON feeds (id);
 
+ALTER TABLE feeds ADD UNIQUE (title);
+ALTER TABLE feeds ADD importing_fields jsonb;
 
+-- #######
 
 CREATE TABLE IF NOT EXISTS feeds_raw_data
 (
