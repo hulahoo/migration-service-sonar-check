@@ -217,6 +217,18 @@ CREATE TABLE IF NOT EXISTS processes
 );
 CREATE INDEX IF NOT EXISTS ix_jobs_id ON processes (id);
 
+
+
+CREATE TABLE IF NOT EXISTS token
+(
+    key        varchar(40) primary key,
+    user_id    bigint,
+    created_at timestamp with time zone
+);
+CREATE INDEX IF NOT EXISTS ix_key ON token (key);
+
+
+
 -- #######
 
 CREATE TABLE IF NOT EXISTS feeds
