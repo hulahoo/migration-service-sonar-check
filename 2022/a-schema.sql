@@ -129,7 +129,7 @@ CREATE INDEX IF NOT EXISTS ix_stat_received_object_created_at ON stat_received_o
 CREATE INDEX IF NOT EXISTS ix_stat_received_object_id ON stat_received_objects (id);
 
 -- Added indicator_id to stat_received_objects
-ALTER TABLE stat_received_objects ADD indicator_id uuid;
+ALTER TABLE stat_received_objects ADD COLUMN IF NOT EXISTS indicator_id uuid;
 CREATE INDEX IF NOT EXISTS ix_stat_received_object_indicator_id ON stat_received_objects (indicator_id);
 
 -- #######
@@ -142,7 +142,7 @@ CREATE INDEX IF NOT EXISTS ix_stat_checked_object_created_at ON stat_checked_obj
 CREATE INDEX IF NOT EXISTS ix_stat_checked_object_id ON stat_checked_objects (id);
 
 -- Added indicator_id to stat_checked_objects
-ALTER TABLE stat_checked_objects ADD indicator_id uuid;
+ALTER TABLE stat_checked_objects ADD COLUMN IF NOT EXISTS indicator_id uuid;
 CREATE INDEX IF NOT EXISTS ix_stat_checked_object_indicator_id ON stat_received_objects (indicator_id);
 
 -- #######
@@ -261,7 +261,7 @@ CREATE INDEX IF NOT EXISTS ix_feed_created_at ON feeds (created_at);
 CREATE INDEX IF NOT EXISTS ix_feed_id ON feeds (id);
 
 ALTER TABLE feeds ADD UNIQUE (title);
-ALTER TABLE feeds ADD importing_fields jsonb;
+ALTER TABLE feeds ADD COLUMN IF NOT EXISTS importing_fields jsonb;
 
 -- #######
 
