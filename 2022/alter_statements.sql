@@ -8,3 +8,6 @@ CREATE INDEX IF NOT EXISTS ix_stat_checked_object_indicator_id ON stat_received_
 
 ALTER TABLE feeds ADD UNIQUE (title);
 ALTER TABLE feeds ADD COLUMN IF NOT EXISTS importing_fields jsonb;
+
+ALTER TABLE processes ADD COLUMN IF NOT EXISTS request jsonb;
+ALTER TABLE processes ADD COLUMN IF NOT EXISTS name varchar(128);
