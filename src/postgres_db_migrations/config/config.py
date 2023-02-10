@@ -41,7 +41,7 @@ def load_config(path: str = None) -> Config:
             port=env.str('APP_POSTGRESQL_PORT')
         ),
         app=AppConfig(
-            table_prefix=env.str('METADATA_TABLE_PREFIX'),
+            table_prefix=env.str('METADATA_TABLE_PREFIX', default=''),
             scripts_path=os.path.join(os.getcwd(), env.str('SCRIPTS_PATH')),
             session_cookie_secure=env.str('SESSION_COOKIE_SECURE'),
             csrf_enabled=env.str('CSRF_ENABLED')
