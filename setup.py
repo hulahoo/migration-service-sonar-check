@@ -3,8 +3,15 @@ from setuptools import setup, find_packages
 
 install_requires = [
     ('sqlalchemy', '1.4.46'),
-    ('psycopg2', '2.9.5'),
+    ('psycopg2-binary', '2.9.5'),
     ('sqlparse', '0.4.3'),
+    ('python-dotenv', '0.21.0'),
+    ('Flask', '1.0.1'),
+    ('flask-restplus', '0.13.0'),
+    ('Flask-WTF', '1.0.1'),
+    ('prometheus-client', '0.16.0'),
+    ('environs', '9.5.0'),
+    ('psutil', '5.9.4')
 ]
 
 CI_PROJECT_NAME = os.environ.get("CI_PROJECT_NAME", "postgres-db-migrations")
@@ -19,7 +26,7 @@ setup(
     description=CI_PROJECT_TITLE,
     url=CI_PROJECT_URL,
     install_requires=[">=".join(req) for req in install_requires],
-    python_requires=">=3.10.3",
+    python_requires=">=3.10.8",
     packages=find_packages(where="src"),
     package_dir={"": "src"},
     entry_points={

@@ -11,14 +11,16 @@ src/postgres-db-migrations/config
 ## Информаци о ENV-параметрах
 Имеющиеся env-параметры в проекте:
 ```
-POSTGRES_USER=
-POSTGRES_PASS=
-POSTGRES_HOST=
-POSTGRES_PORT=
-POSTGRES_DB=
+APP_POSTGRESQL_HOST=localhost
+APP_POSTGRESQL_PASSWORD=password
+APP_POSTGRESQL_USER=postgres
+APP_POSTGRESQL_NAME=db
+APP_POSTGRESQL_PORT=5432
 
 METADATA_TABLE_PREFIX=v1
 SCRIPTS_PATH=migrations
+CSRF_ENABLED=True/False
+SESSION_COOKIE_SECURE=True/False
 ```
 
 ### Запуск миграций

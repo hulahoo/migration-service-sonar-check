@@ -1,94 +1,5 @@
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
--- Если есть права на удаление БД:
-
--- DROP DATABASE IF EXISTS db;
--- CREATE DATABASE db
---    WITH
---     OWNER = postgres
---     ENCODING = 'UTF8'
---     LC_COLLATE = 'ru_RU.UTF-8@icu'
---     LC_CTYPE = 'ru_RU.UTF-8'
---     TABLESPACE = pg_default
---     CONNECTION LIMIT = -1
---     IS_TEMPLATE = False;
--- GRANT ALL ON DATABASE db TO postgres;
--- GRANT ALL ON DATABASE db TO dbuser;
--- GRANT TEMPORARY, CONNECT ON DATABASE db TO PUBLIC;
-
--- -- DROP STATEMENTS START
-
--- users table/index
--- DROP TABLE IF EXISTS "users";
---
--- -- sessions table/index
--- DROP TABLE IF EXISTS "sessions";
---
--- -- stat_received_objects table/index
--- DROP TABLE IF EXISTS "stat_received_objects";
---
--- -- stat_checked_objects table/index
--- DROP TABLE IF EXISTS "stat_checked_objects";
---
--- -- stat_matched_objects table/index
--- DROP TABLE IF EXISTS "stat_matched_objects";
---
--- -- indicators table/index
--- DROP TABLE IF EXISTS "indicators";
---
--- -- indicator_feed_relationships table/index
--- DROP TABLE IF EXISTS "indicator_feed_relationships";
---
--- -- processes table/index
--- DROP TABLE IF EXISTS "processes";
---
--- -- feeds table/index
--- DROP TABLE IF EXISTS "feeds";
---
--- -- feeds_raw_data table/index
--- DROP TABLE IF EXISTS "feeds_raw_data";
---
--- -- tags table/index
--- DROP TABLE IF EXISTS "tags";
---
--- -- indicator_tag_relationships table/index
--- DROP TABLE IF EXISTS "indicator_tag_relationships";
---
--- -- indicator_activities table/index
--- DROP TABLE IF EXISTS "indicator_activities";
---
--- -- detections table/index
--- DROP TABLE IF EXISTS "detections";
---
--- -- detections table/index
--- DROP TABLE IF EXISTS "detections";
---
--- -- detection_tag_relationships table/index
--- DROP TABLE IF EXISTS "detection_tag_relationships";
---
--- -- context_sources table/index
--- DROP TABLE IF EXISTS "context_sources";
---
--- -- indicator_context_source_relationships table/index
--- DROP TABLE IF EXISTS "indicator_context_source_relationships";
---
--- -- search_history table/index
--- DROP TABLE IF EXISTS "search_history";
---
--- -- search_history table/index
--- DROP TABLE IF EXISTS "search_history";
---
--- -- user_settings table/index
--- DROP TABLE IF EXISTS "user_settings";
---
--- -- platform_settings table/index
--- DROP TABLE IF EXISTS "platform_settings";
---
--- -- audit_logs table/index
--- DROP TABLE IF EXISTS "audit_logs";
-
--- -- DROP STATEMENTS END
-
 
 CREATE TABLE IF NOT EXISTS "users" (
     id         bigserial NOT NULL PRIMARY KEY,
@@ -463,3 +374,19 @@ CREATE TABLE IF NOT EXISTS test_data
     value              jsonb
 );
 CREATE INDEX IF NOT EXISTS ix_test_data_id ON test_data (id);
+
+
+
+
+ALTER TABLE stat_received_objects ADD COLUMN IF NOT EXISTS indicator_id uuid;
+CREATE INDEX IF NOT EXISTS ix_stat_received_object_indicator_id ON stat_received_objects (indicator_id);
+
+
+ALTER TABLE stat_checked_objects ADD COLUMN IF NOT EXISTS indicator_id uuid;
+CREATE INDEX IF NOT EXISTS ix_stat_checked_object_indicator_id ON stat_received_objects (indicator_id);
+
+ALTER TABLE feeds ADD UNIQUE (title);
+ALTER TABLE feeds ADD COLUMN IF NOT EXISTS importing_fields jsonb;
+
+ALTER TABLE processes ADD COLUMN IF NOT EXISTS request jsonb;
+ALTER TABLE processes ADD COLUMN IF NOT EXISTS name varchar(128);

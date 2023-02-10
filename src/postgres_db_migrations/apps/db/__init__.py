@@ -15,6 +15,5 @@ engine = create_engine(
     pool_size=15,
 )
 
-metadata = MetaData(bind=engine)
-Base = declarative_base(metadata=metadata)
+Base = declarative_base()
 session = scoped_session(sessionmaker(autocommit=False, autoflush=False, bind=engine))

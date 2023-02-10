@@ -1,5 +1,6 @@
 from datetime import datetime
 
+from sqlalchemy import text
 from sqlalchemy.exc import DatabaseError
 
 from postgres_db_migrations.apps.utils import scan_dir
@@ -52,7 +53,6 @@ class MigrationService:
 
     def _apply_migrations_from_file(self, file: MigrationFile) -> bool:
         migration = migration_provider.get_by_filename(file.relative_path)
-
         # skip applied migrations
         if migration.is_applied:
             return True
@@ -66,8 +66,7 @@ class MigrationService:
                         logger.info(
                             f'Apply migration # {i} of {len(file.sql_statements)} from [ {file.relative_path} ]...'
                         )
-
-                        connection.execute(sql_statement)
+                        connection.execute(text(sql_statement))
 
         except DatabaseError as e:
             migration.has_errors = True

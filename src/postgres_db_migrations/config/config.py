@@ -18,6 +18,8 @@ class AppConfig:
     table_prefix: str
     scripts_path: str
     verbose: bool = False
+    csrf_enabled: bool = True
+    session_cookie_secure: bool = True
 
 
 @dataclass
@@ -32,15 +34,17 @@ def load_config(path: str = None) -> Config:
 
     return Config(
         db=DBConfig(
-            name=env.str('POSTGRES_DB'),
-            user=env.str('POSTGRES_USER'),
-            password=env.str('POSTGRES_PASS'),
-            host=env.str('POSTGRES_HOST'),
-            port=env.str('POSTGRES_PORT')
+            name=env.str('APP_POSTGRESQL_NAME'),
+            user=env.str('APP_POSTGRESQL_USER'),
+            password=env.str('APP_POSTGRESQL_PASSWORD'),
+            host=env.str('APP_POSTGRESQL_HOST'),
+            port=env.str('APP_POSTGRESQL_PORT')
         ),
         app=AppConfig(
             table_prefix=env.str('METADATA_TABLE_PREFIX'),
             scripts_path=os.path.join(os.getcwd(), env.str('SCRIPTS_PATH')),
+            session_cookie_secure=env.str('SESSION_COOKIE_SECURE'),
+            csrf_enabled=env.str('CSRF_ENABLED')
         )
     )
 

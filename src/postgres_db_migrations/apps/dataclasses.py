@@ -44,9 +44,11 @@ class MigrationFile:
 
     @property
     def sql_statements(self) -> List[str]:
-        return list(
-            map(
-                lambda statement: str(statement).strip(),
-                sqlparse.parse(self.raw_content, encoding='utf8')
-            )
-        )
+        with open(self.full_path, 'r') as file:
+            for statement in file:
+                return list(
+                    map(
+                        lambda statement: str(statement).strip(),
+                        sqlparse.parse(statement, encoding='utf8')
+                    )
+                )

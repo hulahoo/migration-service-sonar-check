@@ -1,0 +1,29 @@
+psvc:
+  name: Сервис миграций
+  description: Сервис применения и контроля миграций
+  publishAPI: true
+
+replicaCount: 1
+
+env:
+  SCRIPTS_PATH: "src/postgres_db_migrations/migrations/2022/"
+  METADATA_TABLE_PREFIX: "v1"
+  CSRF_ENABLED: True
+  SESSION_COOKIE_SECURE: True
+
+resources:
+  limits:
+    memory: 1Gi
+    cpu: 1000m
+  requests:
+    memory: 512Mi
+    cpu: 100m
+
+
+databases:
+  - type: POSTGRESQL
+    host: 10.7.27.113
+    port: 5432
+    name: db
+
+strategyType: Recreate
