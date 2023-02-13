@@ -1,6 +1,3 @@
-CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
-
-
 CREATE TABLE IF NOT EXISTS "users" (
     id         BIGSERIAL NOT NULL PRIMARY KEY,
     "login"    VARCHAR(128) NOT NULL UNIQUE,
@@ -379,11 +376,8 @@ CREATE TABLE IF NOT EXISTS test_data
 CREATE INDEX IF NOT EXISTS ix_test_data_id ON test_data (id);
 
 
-
-
 ALTER TABLE stat_received_objects ADD COLUMN IF NOT EXISTS indicator_id uuid;
 CREATE INDEX IF NOT EXISTS ix_stat_received_object_indicator_id ON stat_received_objects (indicator_id);
-
 
 ALTER TABLE stat_checked_objects ADD COLUMN IF NOT EXISTS indicator_id uuid;
 CREATE INDEX IF NOT EXISTS ix_stat_checked_object_indicator_id ON stat_received_objects (indicator_id);
@@ -393,3 +387,5 @@ ALTER TABLE feeds ADD COLUMN IF NOT EXISTS importing_fields jsonb;
 
 ALTER TABLE processes ADD COLUMN IF NOT EXISTS request jsonb;
 ALTER TABLE processes ADD COLUMN IF NOT EXISTS name varchar(128);
+
+

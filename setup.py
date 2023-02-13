@@ -29,6 +29,7 @@ setup(
     python_requires=">=3.10.8",
     packages=find_packages(where="src"),
     package_dir={"": "src"},
+    package_data={"": ["migrations/2022/*.sql"]},
     entry_points={
         'console_scripts': [
             CI_PROJECT_NAME + " = " + "postgres_db_migrations.main:execute",

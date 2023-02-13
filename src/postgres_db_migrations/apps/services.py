@@ -36,8 +36,6 @@ class MigrationService:
                 break
 
     def _print_details(self, migration: Migration, file: MigrationFile):
-        if not settings.app.verbose:
-            return
 
         details = []
 

@@ -1,4 +1,5 @@
-import argparse
+import pathlib
+import os
 
 from sqlalchemy import inspect
 
@@ -17,16 +18,7 @@ def execute() -> None:
         Migration.__table__.create(engine)
         logger.info("Create table")
 
-    parser = argparse.ArgumentParser(
-        prog='postgres_db_migrations',
-        description='Apply db migrations',
-        epilog=''
-    )
-    parser.add_argument('-v', '--verbose', action='store_true', help='Print details for each file')
+    root = pathlib.Path(__file__).parent
+    script_path = pathlib.Path(f'{root}/{settings.app.scripts_path}')
 
-    args = parser.parse_args()
-
-    settings.app.verbose = args.verbose
-    print(settings.app.scripts_path, '???')
-
-    migration_service.read_files(settings.app.scripts_path)
+    migration_service.read_files(script_path)

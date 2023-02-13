@@ -17,7 +17,6 @@ class DBConfig:
 class AppConfig:
     table_prefix: str
     scripts_path: str
-    verbose: bool = False
     csrf_enabled: bool = True
     session_cookie_secure: bool = True
 
@@ -42,9 +41,9 @@ def load_config(path: str = None) -> Config:
         ),
         app=AppConfig(
             table_prefix=env.str('METADATA_TABLE_PREFIX', default=''),
-            scripts_path=os.path.join(os.getcwd(), env.str('SCRIPTS_PATH', default='src/postgres_db_migrations/migrations/2022/')),
-            session_cookie_secure=env.bool('SESSION_COOKIE_SECURE'),
-            csrf_enabled=env.bool('CSRF_ENABLED')
+            scripts_path=env.str('SCRIPTS_PATH'),
+            session_cookie_secure=env.str('SESSION_COOKIE_SECURE'),
+            csrf_enabled=env.str('CSRF_ENABLED')
         )
     )
 

@@ -12,6 +12,6 @@ def scan_dir(root: str) -> Iterator[MigrationFile]:
         for filename in files:
             yield MigrationFile(
                 root=root,
-                path=root_dir.replace(root, '').strip(sep),
+                path=root_dir,
                 name=filename,
             )
