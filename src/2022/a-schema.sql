@@ -2,19 +2,19 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 
 CREATE TABLE IF NOT EXISTS "users" (
-    id         bigserial NOT NULL PRIMARY KEY,
-    "login"    varchar(128) NOT NULL UNIQUE,
-    pass_hash  varchar(256) NOT NULL,
-    full_name  varchar(128) NOT NULL,
-    "role"     varchar(128) NOT NULL,
-    is_active  boolean NOT NULL default true,
-    created_at timestamp with time zone NOT NULL,
-    updated_at timestamp with time zone NOT NULL,
-    deleted_at timestamp with time zone NULL,
-    created_by bigint NULL,
-    last_login timestamp with time zone NULL,
-    "admin"    boolean default false,
-    staff      boolean default false
+    id         BIGSERIAL NOT NULL PRIMARY KEY,
+    "login"    VARCHAR(128) NOT NULL UNIQUE,
+    pass_hash  VARCHAR(256) NOT NULL,
+    full_name  VARCHAR(128) NOT NULL,
+    "role"     VARCHAR(128) NOT NULL,
+    is_active  BOOLEAN NOT NULL DEFAULT TRUE,
+    created_at TIMESTAMP WITH TIME ZONE NOT NULL,
+    updated_at TIMESTAMP WITH TIME ZONE NOT NULL,
+    deleted_at TIMESTAMP WITH TIME ZONE NULL,
+    created_by BIGINT NULL,
+    is_deleted BOOLEAN DEFAULT FALSE,
+    "admin"    BOOLEAN DEFAULT FALSE,
+    staff      BOOLEAN DEFAULT FALSE
 );
 CREATE INDEX IF NOT EXISTS ix_user_login ON users ("login" text_pattern_ops);
 CREATE INDEX IF NOT EXISTS ix_user_created_by ON users ("created_by");
