@@ -22,11 +22,13 @@ CREATE INDEX IF NOT EXISTS ix_user_created_by ON users ("created_by");
 
 
 CREATE TABLE IF NOT EXISTS "sessions" (
-    id               bigserial NOT NULL PRIMARY KEY,
-    user_id          bigint NOT NULL,
-    access_token     varchar(255) NOT NULL,
-    last_activity_at timestamp with time zone NOT NULL,
-    created_at       timestamp with time zone NOT NULL
+    id               BIGSERIAL NOT NULL PRIMARY KEY,
+    user_id          BIGINT NOT NULL,
+    access_token     VARCHAR(255) NOT NULL,
+    last_activity_at TIMESTAMP WITH TIME ZONE NOT NULL,
+    created_at       TIMESTAMP WITH TIME ZONE NOT NULL,
+    is_deleted       BOOLEAN DEFAULT FALSE,
+    deleted_at       TIMESTAMP WITH TIME ZONE NULL
 );
 CREATE INDEX IF NOT EXISTS ix_session_access_token ON sessions (access_token text_pattern_ops);
 
