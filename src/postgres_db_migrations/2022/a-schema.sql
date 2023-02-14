@@ -83,13 +83,15 @@ CREATE TABLE IF NOT EXISTS indicators
     false_detected_counter    bigint,
     positive_detected_counter bigint,
     total_detected_counter    bigint,
-    first_detected_at         timestamp with time zone,
-    last_detected_at          timestamp with time zone,
+    first_detected_at         TIMESTAMP WITH TIME ZONE,
+    last_detected_at          TIMESTAMP WITH TIME ZONE,
     created_by                bigint,
-    created_at                timestamp with time zone,
-    updated_at                timestamp with time zone,
-    deleted_at                timestamp with time zone,
+    created_at                TIMESTAMP WITH TIME ZONE,
+    updated_at                TIMESTAMP WITH TIME ZONE,
+    deleted_at                TIMESTAMP WITH TIME ZONE,
     external_source_link      varchar(255),
+    last_time_actuation       TIMESTAMP WITH TIME ZONE,
+    first_time_actuation      TIMESTAMP WITH TIME ZONE,
     constraint indicators_unique_value_type
         unique (value, ioc_type)
 );
