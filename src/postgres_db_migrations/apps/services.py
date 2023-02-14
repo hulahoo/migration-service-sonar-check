@@ -45,7 +45,7 @@ class MigrationService:
         details.append(f'File size: {migration.file_size}')
         details.append(f'File hash: {migration.file_hash}')
         details.append(f'Created At: {migration.created_at}')
-        details.append(f'\n{file.raw_content}\n')
+        details.append(f'\n{file.raw_content[:100]}...\n')
 
         print('\n'.join(details))
 
