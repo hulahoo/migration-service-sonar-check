@@ -9,7 +9,6 @@ from postgres_db_migrations.apps.db.models import Migration
 from postgres_db_migrations.apps.db.providers import MigrationProvider
 from postgres_db_migrations.apps.dataclasses import MigrationFile
 
-from postgres_db_migrations.config.config import settings
 from postgres_db_migrations.config.log_conf import logger
 
 

@@ -6,16 +6,13 @@ from flask_wtf.csrf import CSRFProtect
 from sqlalchemy.exc import OperationalError
 from prometheus_client import generate_latest, CONTENT_TYPE_LATEST
 
-from postgres_db_migrations.config.log_conf import logger
 from postgres_db_migrations.apps.db import engine
-from postgres_db_migrations.config.config import settings
+from postgres_db_migrations.config.log_conf import logger
 
 
 app = Flask(__name__)
 SECRET_KEY = os.urandom(32)
 app.config['SECRET_KEY'] = SECRET_KEY
-app.config["SESSION_COOKIE_SECURE"] = settings.SESSION_COOKIE_SECURE
-app.config['WTF_CSRF_ENABLED'] = settings.CSRF_ENABLED
 
 csrf = CSRFProtect()
 csrf.init_app(app)

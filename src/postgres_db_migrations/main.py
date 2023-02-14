@@ -1,23 +1,20 @@
-import pathlib
+import threading
 
-from sqlalchemy import inspect
+from .migrations import migrate
+from .web.routers.api import execute as flask_app
+from .config.log_conf import logger
 
-from postgres_db_migrations.apps.db import engine
-from postgres_db_migrations.apps.db.models import Migration
-from postgres_db_migrations.apps.services import MigrationService
-from postgres_db_migrations.config.config import settings
-from postgres_db_migrations.config.log_conf import logger
+def execute():
+    """
+    Function entrypoint to start:
+    1. Apply db migrations
+    2. Flask application to serve enpoints
+    """
+    flask_thread = threading.Thread(target=flask_app)
+    migrations_thread = threading.Thread(target=migrate)
 
-migration_service = MigrationService()
+    logger.info("Start Flask app")
+    flask_thread.start()
 
-
-def execute() -> None:
-    # create _migrations table if it not exists
-    if not inspect(engine).has_table(f'{settings.app.table_prefix}_migrations'):
-        Migration.__table__.create(engine)
-        logger.info("Create table")
-
-    root = pathlib.Path(__file__).parent
-    script_path = pathlib.Path(f'{root}/{settings.app.scripts_path}')
-
-    migration_service.read_files(str(script_path))
+    logger.info("Start migrations")
+    migrations_thread.start()

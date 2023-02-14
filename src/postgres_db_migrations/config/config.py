@@ -15,15 +15,14 @@ class DBConfig:
 class AppConfig:
     table_prefix: str
     scripts_path: str
-    csrf_enabled: bool = True
-    session_cookie_secure: bool = True
+    verbose: bool = False
+    script: str = """CREATE EXTENSION IF NOT EXISTS "uuid-ossp";"""
 
 
 @dataclass
 class Config:
     db: DBConfig
     app: AppConfig
-
 
 def load_config(path: str = None) -> Config:
     env = Env()
@@ -38,10 +37,8 @@ def load_config(path: str = None) -> Config:
             port=env.str('APP_POSTGRESQL_PORT')
         ),
         app=AppConfig(
-            table_prefix=env.str('METADATA_TABLE_PREFIX', default=''),
+            table_prefix=env.str('METADATA_TABLE_PREFIX'),
             scripts_path=env.str('SCRIPTS_PATH'),
-            session_cookie_secure=env.str('SESSION_COOKIE_SECURE'),
-            csrf_enabled=env.str('CSRF_ENABLED')
         )
     )
 
