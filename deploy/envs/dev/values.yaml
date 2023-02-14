@@ -6,7 +6,7 @@ psvc:
 replicaCount: 1
 
 env:
-  SCRIPTS_PATH: "src/postgres_db_migrations/migrations/2022/"
+  SCRIPTS_PATH: "2022"
   METADATA_TABLE_PREFIX: "v1"
   CSRF_ENABLED: True
   SESSION_COOKIE_SECURE: True
