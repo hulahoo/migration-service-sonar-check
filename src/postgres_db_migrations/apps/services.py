@@ -34,7 +34,7 @@ class MigrationService:
             if not self._apply_migrations_from_file(file):
                 break
 
-    def _print_details(self, migration: Migration, file: MigrationFile):
+    def _print_details(self, migration: Migration):
 
         details = []
 
@@ -44,17 +44,17 @@ class MigrationService:
         details.append(f'File size: {migration.file_size}')
         details.append(f'File hash: {migration.file_hash}')
         details.append(f'Created At: {migration.created_at}')
-        details.append(f'\n{file.raw_content[:100]}...\n')
 
         print('\n'.join(details))
 
     def _apply_migrations_from_file(self, file: MigrationFile) -> bool:
         migration = migration_provider.get_by_filename(file.relative_path)
         # skip applied migrations
+        logger.info(f"Migration file applied status: {migration.is_applied}")
         if migration.is_applied:
             return True
 
-        self._print_details(migration, file)
+        self._print_details(migration)
 
         try:
             with engine.connect() as connection:
