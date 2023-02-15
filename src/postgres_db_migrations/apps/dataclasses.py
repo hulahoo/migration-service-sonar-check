@@ -40,15 +40,14 @@ class MigrationFile:
     @property
     def raw_content(self):
         with open(self.full_path, 'r') as file:
-            return file.read()
+            data = file.read()
+            return data
 
     @property
     def sql_statements(self) -> List[str]:
-        with open(self.full_path, 'r') as file:
-            for statement in file:
-                return list(
-                    map(
-                        lambda statement: str(statement).strip(),
-                        sqlparse.parse(statement, encoding='utf8')
-                    )
-                )
+        return list(
+            map(
+                lambda statement: str(statement).strip(),
+                sqlparse.parse(self.raw_content, encoding='utf8')
+            )
+        )
