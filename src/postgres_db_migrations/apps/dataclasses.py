@@ -3,7 +3,7 @@ import sqlparse
 from typing import Optional, List
 from dataclasses import dataclass
 from os import path, sep
-from hashlib import md5
+from hashlib import sha512
 
 from postgres_db_migrations.apps.enums import FileType
 
@@ -35,7 +35,7 @@ class MigrationFile:
 
     @property
     def hash(self) -> str:
-        return md5(open(self.full_path, 'rb').read()).hexdigest()
+        return sha512(open(self.full_path, 'rb').read()).hexdigest()
 
     @property
     def raw_content(self):
