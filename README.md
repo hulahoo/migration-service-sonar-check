@@ -103,7 +103,16 @@ services:
     restart: unless-stopped
     expose:
       - 5432
-    
+    environment:
+        POSTGRES_HOST_AUTH_METHOD: trust
+        POSTGRES_USER: dbuser
+        POSTGRES_PASSWORD: test
+        POSTGRES_SERVER: db
+        POSTGRES_DB_PORT: 5432
+        POSTGRES_DB: db
+    healthcheck:
+        test: pg_isready -U dbuser
+
     migrations:
         image: rshb-cti-migrations:staging
         environment:
@@ -117,6 +126,7 @@ services:
             SESSION_COOKIE_SECURE: True
             CSRF_ENABLED: True
         depends_on:
-            - db
+            db:
+                condition: service_healthy
 ```
  
