@@ -34,7 +34,8 @@ class MigrationService:
             if not self._apply_migrations_from_file(file):
                 break
 
-    def _print_details(self, migration: Migration):
+    @staticmethod
+    def _print_details(migration: Migration):
 
         details = []
 
