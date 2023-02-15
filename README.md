@@ -98,35 +98,35 @@ docker tag rshb-cti-migrations:latest rshb-cti-migrations:staging
 ```yaml
 services:
     db:
-    image: postgres:14.1-alpine
-    container_name: db
-    restart: unless-stopped
-    expose:
+      image: postgres:14.1-alpine
+      container_name: db
+      restart: unless-stopped
+      expose:
       - 5432
-    environment:
-        POSTGRES_HOST_AUTH_METHOD: trust
-        POSTGRES_USER: dbuser
-        POSTGRES_PASSWORD: test
-        POSTGRES_SERVER: db
-        POSTGRES_DB_PORT: 5432
-        POSTGRES_DB: db
-    healthcheck:
-        test: pg_isready -U dbuser
+      environment:
+          POSTGRES_HOST_AUTH_METHOD: trust
+          POSTGRES_USER: dbuser
+          POSTGRES_PASSWORD: test
+          POSTGRES_SERVER: db
+          POSTGRES_DB_PORT: 5432
+          POSTGRES_DB: db
+      healthcheck:
+          test: pg_isready -U dbuser
 
     migrations:
-        image: rshb-cti-migrations:staging
-        environment:
-            APP_POSTGRESQL_USER: dbuser
-            APP_POSTGRESQL_PASSWORD: test
-            APP_POSTGRESQL_NAME: db
-            APP_POSTGRESQL_HOST: db
-            APP_POSTGRESQL_PORT: 5432
-            METADATA_TABLE_PREFIX: v1
-            SCRIPTS_PATH: "migrations"
-            SESSION_COOKIE_SECURE: True
-            CSRF_ENABLED: True
-        depends_on:
-            db:
-                condition: service_healthy
+      image: rshb-cti-migrations:staging
+      environment:
+          APP_POSTGRESQL_USER: dbuser
+          APP_POSTGRESQL_PASSWORD: test
+          APP_POSTGRESQL_NAME: db
+          APP_POSTGRESQL_HOST: db
+          APP_POSTGRESQL_PORT: 5432
+          METADATA_TABLE_PREFIX: v1
+          SCRIPTS_PATH: "migrations"
+          SESSION_COOKIE_SECURE: True
+          CSRF_ENABLED: True
+      depends_on:
+          db:
+              condition: service_healthy
 ```
  
