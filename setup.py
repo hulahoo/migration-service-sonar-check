@@ -29,7 +29,7 @@ setup(
     python_requires=">=3.10.8",
     packages=find_packages(where="src"),
     package_dir={"": "src"},
-    package_data={"2022": ["*.sql"], "2022.data": ["*.sql"]},
+    package_data={"migrations": ["*.sql"], "migrations.data": ["*.sql"]},
     include_package_data=True,
     entry_points={
         'console_scripts': [

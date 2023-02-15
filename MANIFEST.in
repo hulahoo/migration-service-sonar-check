@@ -1,2 +1,2 @@
-include src/postgres_db_migrations/2022/*.sql
-include src/postgres_db_migrations/2022/data/*.sql
+include src/postgres_db_migrations/migrations/*.sql
+include src/postgres_db_migrations/migrations/data/*.sql

@@ -113,7 +113,7 @@ services:
             APP_POSTGRESQL_HOST: db
             APP_POSTGRESQL_PORT: 5432
             METADATA_TABLE_PREFIX: v1
-            SCRIPTS_PATH: "2022"
+            SCRIPTS_PATH: "migrations"
             SESSION_COOKIE_SECURE: True
             CSRF_ENABLED: True
         depends_on:
